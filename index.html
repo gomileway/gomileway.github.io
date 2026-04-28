@@ -933,13 +933,16 @@
     function submitIosForm(e) {
       e.preventDefault();
       const email = e.target.querySelector('input[name="email"]').value;
-      // Send to Formspree — replace YOUR_FORM_ID with your Formspree form ID
-      fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ email, source: 'ios-waitlist' }),
+        body: JSON.stringify({
+          access_key: '1b47db40-3921-41f0-a8c1-582e0f689cc3',
+          subject: 'MILEWAY iOS Waitlist',
+          email,
+        }),
       })
-        .then(r => {
+        .then(() => {
           document.getElementById('modalForm').style.display = 'none';
           document.getElementById('modalSuccess').style.display = 'block';
         })
