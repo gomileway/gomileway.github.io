@@ -932,23 +932,36 @@
 
     function submitIosForm(e) {
       e.preventDefault();
-      const email = e.target.querySelector('input[name="email"]').value;
+      const btn = e.target.querySelector('button[type="submit"]');
+      const emailVal = e.target.querySelector('input[name="email"]').value;
+      btn.textContent = 'Submitting…';
+      btn.disabled = true;
       fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           access_key: '1b47db40-3921-41f0-a8c1-582e0f689cc3',
           subject: 'MILEWAY iOS Waitlist',
-          email,
+          from_name: 'MILEWAY Website',
+          message: 'iOS waitlist signup: ' + emailVal,
+          replyto: emailVal,
         }),
       })
-        .then(() => {
-          document.getElementById('modalForm').style.display = 'none';
-          document.getElementById('modalSuccess').style.display = 'block';
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('modalForm').style.display = 'none';
+            document.getElementById('modalSuccess').style.display = 'block';
+          } else {
+            btn.textContent = 'Try Again';
+            btn.disabled = false;
+            alert('Something went wrong: ' + (data.message || 'unknown error'));
+          }
         })
-        .catch(() => {
-          document.getElementById('modalForm').style.display = 'none';
-          document.getElementById('modalSuccess').style.display = 'block';
+        .catch(err => {
+          btn.textContent = 'Try Again';
+          btn.disabled = false;
+          alert('Network error — please try again.');
         });
     }
   </script>
