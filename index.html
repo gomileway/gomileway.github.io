@@ -216,29 +216,59 @@
     }
     .hero-phone img { display: block; width: 100%; height: auto; }
 
-    /* ── STATS BAR ── */
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 0;
+    /* ── ODOMETER COUNTER ── */
+    .odometer-section {
+      background: var(--bg2);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .stat-item {
-      flex: 1;
+      padding: 56px 24px;
       text-align: center;
-      padding: 36px 24px;
-      border-right: 1px solid var(--border);
     }
-    .stat-item:last-child { border-right: none; }
-    .stat-num {
-      font-size: 32px;
+    .odometer-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .odometer-counters {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .odometer-counter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .odometer-value {
+      font-size: clamp(48px, 8vw, 80px);
       font-weight: 900;
-      color: var(--accent);
-      letter-spacing: -1px;
+      letter-spacing: -2px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
     }
-    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .odometer-value.miles { color: #fff; }
+    .odometer-value.dollars { color: var(--accent); }
+    .odometer-unit {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .odometer-divider {
+      font-size: 48px;
+      color: var(--border);
+      font-weight: 100;
+      line-height: 1;
+    }
+    .odometer-sublabel {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+    }
 
     /* ── SCREENSHOTS STRIP ── */
     .screenshots-section { padding: 90px 0; }
@@ -605,8 +635,8 @@
       .hero-inner { grid-template-columns: 1fr; gap: 48px; text-align: center; }
       .hero-phone { width: 220px; margin: 0 auto; }
       .hero-sub { margin-left: auto; margin-right: auto; }
-      .stats { flex-wrap: wrap; }
-      .stat-item { min-width: 50%; border-bottom: 1px solid var(--border); }
+      .odometer-counters { gap: 24px; }
+      .odometer-divider { display: none; }
       .feature-row, .feature-row.reverse {
         grid-template-columns: 1fr;
         direction: ltr;
@@ -626,7 +656,7 @@
       .phone-frame { width: 180px; }
       .feature-row-visual .phone-frame { width: 220px; }
       .pro-visual .phone-frame { width: 150px; }
-      .stat-item { min-width: 100%; }
+      .odometer-value { font-size: 52px; }
     }
   </style>
 </head>
@@ -689,23 +719,20 @@
   </section>
 
   <!-- STATS -->
-  <div class="stats">
-    <div class="stat-item">
-      <div class="stat-num">$0.725</div>
-      <div class="stat-label">per mile · 2026 IRS rate</div>
+  <div class="odometer-section">
+    <div class="odometer-label">Every mile tracked = money back at tax time</div>
+    <div class="odometer-counters">
+      <div class="odometer-counter">
+        <div class="odometer-value miles" id="miles-counter">0.0</div>
+        <div class="odometer-unit">miles driven</div>
+      </div>
+      <div class="odometer-divider">=</div>
+      <div class="odometer-counter">
+        <div class="odometer-value dollars" id="dollars-counter">$0.00</div>
+        <div class="odometer-unit">tax deduction</div>
+      </div>
     </div>
-    <div class="stat-item">
-      <div class="stat-num">100%</div>
-      <div class="stat-label">offline · data never leaves your phone</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">3 yr</div>
-      <div class="stat-label">log retention for tax audits</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">no<br>account</div>
-      <div class="stat-label">no sign-up · no cloud</div>
-    </div>
+    <div class="odometer-sublabel">At the 2026 IRS rate of $0.725/mile · all data stays on your phone</div>
   </div>
 
   <!-- SCREENSHOTS STRIP -->
@@ -919,6 +946,45 @@
   </footer>
 
   <script>
+    // Odometer counter animation
+    (function() {
+      const TARGET_MILES = 12847.3;
+      const RATE = 0.725;
+      const DURATION = 2200;
+
+      function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      }
+
+      function animateCounters() {
+        const milesEl = document.getElementById('miles-counter');
+        const dollarsEl = document.getElementById('dollars-counter');
+        const start = performance.now();
+
+        function tick(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / DURATION, 1);
+          const eased = easeOutExpo(progress);
+          const miles = TARGET_MILES * eased;
+          const dollars = miles * RATE;
+          milesEl.textContent = miles.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+          dollarsEl.textContent = '$' + dollars.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      const observer = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) {
+          observer.disconnect();
+          animateCounters();
+        }
+      }, { threshold: 0.4 });
+
+      observer.observe(document.querySelector('.odometer-section'));
+    })();
+
     function scrollShots(dir) {
       const el = document.getElementById('shotsScroll');
       el.scrollBy({ left: dir * 260, behavior: 'smooth' });
