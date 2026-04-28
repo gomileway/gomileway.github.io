@@ -197,18 +197,19 @@
     }
     .screenshots-scroll {
       display: flex;
-      gap: 20px;
+      gap: 16px;
       padding: 0 40px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      justify-content: center;
     }
     .screenshots-scroll::-webkit-scrollbar { display: none; }
     .phone-frame {
       flex: 0 0 auto;
       scroll-snap-align: center;
-      width: 220px;
+      width: 180px;
       border-radius: 28px;
       overflow: hidden;
       border: 2px solid var(--border);
@@ -326,7 +327,7 @@
       justify-content: center;
     }
     .feature-row-visual .phone-frame {
-      width: 260px;
+      width: 240px;
     }
 
     /* ── PRO SECTION ── */
@@ -466,7 +467,7 @@
       .screenshots-scroll { padding: 0 20px; }
       .phone-frame { width: 180px; }
       .feature-row-visual .phone-frame { width: 220px; }
-      .pro-visual .phone-frame { width: 160px; }
+      .pro-visual .phone-frame { width: 150px; }
     }
   </style>
 </head>
