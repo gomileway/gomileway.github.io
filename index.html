@@ -941,10 +941,10 @@
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           access_key: '1b47db40-3921-41f0-a8c1-582e0f689cc3',
-          subject: 'MILEWAY iOS Waitlist',
-          from_name: 'MILEWAY Website',
+          name: 'iOS Waitlist',
+          email: emailVal,
           message: 'iOS waitlist signup: ' + emailVal,
-          replyto: emailVal,
+          subject: 'MILEWAY iOS Waitlist',
         }),
       })
         .then(r => r.json())
